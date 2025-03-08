@@ -1,21 +1,29 @@
-const express = require("express");
+import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
+import { Low } from "lowdb";
+import { JSONFile } from "lowdb/node";
+
 const router = express.Router();
 
-const path = require("path");
-// built-in path module
+// set up __dirname for ES Modules (since it's not available by default)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-const low = require("lowdb");
-const FileSync = require("lowdb/adapters/FileSync");
-const adapter = new FileSync(path.join(__dirname, "db.json"));
-const db = low(adapter);
-// setting up lowDB
+// Setting up lowDB using the JSONFile adapter for db.json in this folder
+const file = path.join(__dirname, "db.json");
+const adapter = new JSONFile(file);
+const db = new Low(adapter);
 
-db.defaults({ debts: [] }).write();
+await db.read();
+db.data = db.data || { debts: [] };
+await db.write();
 
-//GET /api/debt to get all tech debt entries
-router.get("/", (req, res) => {
+// GET /api/debt to get all tech debt entries
+router.get("/", async (req, res) => {
   try {
-    const debts = db.get("debts").value();
+    await db.read();
+    const debts = db.data.debts;
     res.status(200).json(debts);
   } catch (error) {
     console.error("Error fetching tech debt entries:", error);
@@ -23,12 +31,12 @@ router.get("/", (req, res) => {
   }
 });
 
-//GET /api/debt/:id to get entry by id
-
-router.get("/:id", (req, res) => {
+// GET /api/debt/:id to get entry by id
+router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const debt = db.get("debts").find({ id }).value();
+    await db.read();
+    const debt = db.data.debts.find((d) => d.id === id);
     if (!debt) {
       return res.status(404).json({ error: "Tech debt entry not found" });
     }
@@ -39,15 +47,15 @@ router.get("/:id", (req, res) => {
   }
 });
 
-//POST /api/debt Create a new tech debt entry. Expected payload: {title, description, category,severity}
-router.post("/", (req, res) => {
+// POST /api/debt  create a new tech debt entry. Expected payload: { title, description, category, severity }
+router.post("/", async (req, res) => {
   try {
     const { title, description, category, severity } = req.body;
     if (!title || !description || !category || !severity) {
       return res.status(400).json({ error: "Ensure no fields are empty" });
     }
     const newDebt = {
-      id: Date.now().toString(), //make id from timestamp
+      id: Date.now().toString(),
       title,
       description,
       category,
@@ -55,7 +63,9 @@ router.post("/", (req, res) => {
       status: "open",
       createdAt: new Date().toISOString(),
     };
-    db.get("debts").push(newDebt).write();
+    await db.read();
+    db.data.debts.push(newDebt);
+    await db.write();
     res.status(201).json(newDebt);
   } catch (error) {
     console.error("Error creating new tech debt entry:", error);
@@ -64,31 +74,35 @@ router.post("/", (req, res) => {
 });
 
 // PUT /api/debt/:id updates entry by the id
-router.put("/:id", (req, res) => {
+router.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const existingDebt = db.get("debts").find({ id }).value();
+    await db.read();
+    const existingDebt = db.data.debts.find((d) => d.id === id);
     if (!existingDebt) {
       return res.status(404).json({ error: "Tech debt entry not found" });
     }
-    const updatedDebt = db.get("debts").find({ id }).assign(req.body).write();
-
-    res.status(200).json(updatedDebt);
+    // Merge existing entry with new data
+    Object.assign(existingDebt, req.body);
+    await db.write();
+    res.status(200).json(existingDebt);
   } catch (error) {
     console.error(`Error updating tech debt with id ${req.params.id}:`, error);
-    res.status(500).json({ error: " Server Error" });
+    res.status(500).json({ error: "Server Error" });
   }
 });
 
-// DELETE /api/debt/:id Deletes tech debt entry by the ID
-router.delete("/:id", (req, res) => {
+// DELETE /api/debt/:id - Deletes tech debt entry by the ID
+router.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const existingDebt = db.get("debts").find({ id }).value();
-    if (!existingDebt) {
+    await db.read();
+    const index = db.data.debts.findIndex((d) => d.id === id);
+    if (index === -1) {
       return res.status(404).json({ error: "Tech debt entry not found" });
     }
-    db.get("debts").remove({ id }).write();
+    db.data.debts.splice(index, 1);
+    await db.write();
     res.status(200).json({ message: "Tech debt entry deleted successfully" });
   } catch (error) {
     console.error(`Error deleting tech debt with id ${req.params.id}:`, error);
@@ -96,4 +110,4 @@ router.delete("/:id", (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

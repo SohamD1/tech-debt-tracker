@@ -1,7 +1,7 @@
 {
   "name": "tech-debt-tracker",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "backend/index.js",
   "scripts": {
     "start": "node backend/index.js",
     "dev": "nodemon backend/index.js",
@@ -14,7 +14,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/SohamD1/tech-debt-tracker/issues"
   },
