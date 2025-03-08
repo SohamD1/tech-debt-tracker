@@ -21,10 +21,10 @@
   "homepage": "https://github.com/SohamD1/tech-debt-tracker#readme",
   "description": "",
   "dependencies": {
+    "body-parser": "^1.20.1",
+    "cors": "^2.8.5",
     "express": "^4.21.2",
     "lowdb": "^7.0.1",
-    "nodemon": "^3.1.9",
-    "body-parser": "^1.20.1",
-    "cors": "^2.8.5"
+    "nodemon": "^3.1.9"
   }
 }
