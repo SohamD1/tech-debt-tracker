@@ -1,0 +1,26 @@
+{
+  "name": "tech-debt-tracker",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SohamD1/tech-debt-tracker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/SohamD1/tech-debt-tracker/issues"
+  },
+  "homepage": "https://github.com/SohamD1/tech-debt-tracker#readme",
+  "description": "",
+  "dependencies": {
+    "express": "^4.21.2",
+    "lowdb": "^7.0.1",
+    "nodemon": "^3.1.9"
+  }
+}
