@@ -13,7 +13,7 @@ const __dirname = path.dirname(__filename);
 // Setting up lowDB using the JSONFile adapter for db.json in this folder
 const file = path.join(__dirname, "db.json");
 const adapter = new JSONFile(file);
-const db = new Low(adapter);
+const db = new Low(adapter, { defaultData: { debts: [] } });
 
 await db.read();
 db.data = db.data || { debts: [] };
