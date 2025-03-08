@@ -87,14 +87,52 @@ const DebtForm = ({
           </Form.Group>
           <Form.Group className="mb-3" controlId="formSeverity">
             <Form.Label>Severity</Form.Label>
-            <Form.Control
-              type="text"
-              name="severity"
-              value={form.severity}
-              onChange={handleChange}
-              required
-              placeholder="Low, Medium, or High"
-            />
+            <div>
+              <Button
+                type="button"
+                style={{
+                  backgroundColor: "yellow",
+                  border: "none",
+                  marginRight: "0.5rem",
+                  color: "black",
+                }}
+                onClick={() =>
+                  setForm((prev) => ({ ...prev, severity: "Low" }))
+                }
+                active={form.severity === "Low"}
+              >
+                Low
+              </Button>
+              <Button
+                type="button"
+                style={{
+                  backgroundColor: "orange",
+                  border: "none",
+                  marginRight: "0.5rem",
+                  color: "black",
+                }}
+                onClick={() =>
+                  setForm((prev) => ({ ...prev, severity: "Medium" }))
+                }
+                active={form.severity === "Medium"}
+              >
+                Medium
+              </Button>
+              <Button
+                type="button"
+                style={{
+                  backgroundColor: "red",
+                  border: "none",
+                  color: "black",
+                }}
+                onClick={() =>
+                  setForm((prev) => ({ ...prev, severity: "High" }))
+                }
+                active={form.severity === "High"}
+              >
+                High
+              </Button>
+            </div>
           </Form.Group>
           <Button variant="primary" type="submit">
             {selectedDebt ? "Update" : "Add"}
